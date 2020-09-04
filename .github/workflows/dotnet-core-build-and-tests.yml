@@ -1,0 +1,23 @@
+name: .NET Core
+
+on: [ push , pull_request ]    
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Install dependencies and Build fappdeploy
+      run: |
+           cd ./fappdeploy/
+           dotnet restore
+           dotnet build
+           
+    - name: build and test functionAppTests
+      run: |
+           cd ./functionAppTests/
+           dotnet restore
+           dotnet test
