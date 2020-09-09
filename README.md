@@ -13,7 +13,7 @@ This function-app once deployed, can be registered to event grid either manually
 
 If you don’t have an Azure subscription, create a free account before you begin. Get started today with a [free Azure account](https://azure.com/free/open-source)!
 
-### 3. Setting up the required secrets
+### 2. Setting up the required secrets
 
 #### To allow GitHub Actions to access Azure
 An [Azure service principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals) needs to be generated. Just go to the Azure Portal to find the details of your resource group. Then start the Cloud CLI or install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) on your computer and execute the following command to generate the required credentials:
@@ -41,10 +41,6 @@ This will generate the following JSON output:
 
 Add this JSON output as [a secret](https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets) with the name `AZURE_CREDENTIALS` in your GitHub repository:
 
-<p align="center">
-  <img src="docs/images/secrets.png" alt="GitHub Template repository" width="700"/>
-</p>
-
 To do so, click on the Settings tab in your repository, then click on Secrets and finally add the new secret with the name `AZURE_CREDENTIALS` to your repository.
 
 Please follow [this link](https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets) for more details. 
@@ -52,22 +48,15 @@ Please follow [this link](https://help.github.com/en/actions/configuring-and-man
 #### To Allow Azure to trigger a GitHub Workflow
  We also need GH PAT token with `repo` access so that function can trigger the appropriate workflow by sending the repository dispatch event to Github Repository with this PAT token. 
  
- <p align="center">
-  <img src="docs/images/pat_scope.PNG" alt="GitHub Template repository" width="700"/>
-</p>
- 
  Add the PAT token with as [a secret](https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets) with the name `PAT_TOKEN` in your GitHub repository:
- <p align="center">
-  <img src="docs/images/pat_secret.png" alt="GitHub Template repository" width="700"/>
-</p>
 
 
 #### parameters_file (Parameters File)
 
 A sample file can be found in this repository in the folder `.cloud/.azure`. The JSON file can include the following parameters:
 
-| Parameter             | Required|  Default    | Description |
-| -------------------   | --------|  ---------- | ----------- |
+| Parameter             | Required|  Default | Description |
+| -------------------   | --------|  ----------| ----------- |
 | functionAppName       |  x      |  fappDeploy | Function app name |
 | functionGitHubURL     |  x      |  https://github.com/mlopstemplates/function_app.git | Github URL of the function app repository. |
 | functionGitHubBranch  |  x      |  master     | Github branch of the function app repository. |
