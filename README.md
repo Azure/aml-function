@@ -1,7 +1,7 @@
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Faml-function%2Fmaster%2F.cloud%2F.azure%2Fazuredeploy.json)
 
 # aml_function 
-This repository contains an Azure Function app which contains an Http Trigger function. The function can send github repository dispatch event when triggered. The function name is generic_trigger function which can be invoked by sending a POST request. The function has a specified set of Azure event sources, if the request body contains any of these event sources then it converts the event_type to an appropriate format understandable by Github workflows and sends the repository dispatch event to the Github repository specified in the request parameter. 
+This repository contains an Azure Function app code which contains an Http Trigger function. The function named 'generic_trigger' can send github repository dispatch event when triggered. The function can be invoked by sending a POST request. The function process the Azure events if the event source is from the list of Azure Resources specified below. The function converts the event_type to an appropriate format understandable by Github workflows and sends the repository dispatch event to the Github repository specified in the request parameter. 
 This function-app once deployed, can be registered to event grid either manually or with ARM template by specifying the function endpoint as webhook url of event subscription using GitHub workflow.
 
 ### 1. Prerequisites
@@ -53,7 +53,7 @@ Please follow [this link](https://help.github.com/en/actions/configuring-and-man
 
 #### parameters_file (Parameters File)
 
-A sample file can be found in this repository in the folder `.cloud/.azure`. The JSON file can include the following parameters:
+A sample file can be found in this repository in the folder `.cloud/.azure/`. The JSON file can include the following parameters:
 
 | Parameter             | Required|  Default | Description |
 | -------------------   | --------|  ----------| ----------- |
@@ -65,20 +65,25 @@ A sample file can be found in this repository in the folder `.cloud/.azure`. The
 | patToken              |  x      |  PAT_TOKEN  | This is a Github Personal Access Token with `repo` access, stored as a secret in the Github Repository where this template is being used.. |
 
 
-### Basic Requirements to use the Deploy to Azure button (Mandatory):
+### Deploy to Azure button 
+
+  #### Mandatory Requirements:
   1. **Subscription**: You need to select a subscription plan in order to deploy to Azure. Get started today with a [free Azure account](https://azure.com/free/open-source)!
   2. **Resource Group**: You can either select an existing resource group or create a new one.
-  3. **Pat Token**: You need to provide the personal access token.
+  3. **Pat Token**: You need to provide GH PAT token with `repo` access so that function can trigger the appropriate workflow by sending the repository dispatch event to Github Repository with this PAT token.
   
   ##### Other optional configurable parameters to use with Deploy to Azure button
    1. **Function App Name**: Name use as base-template to name the resources to be deployed in Azure (Default = fappDeploy).
-   2. **Function Git Hub URL**: The URL of GitHub (ending by .git)
-   3. **Function Git Hub Branch**: Name of the branch to use when deploying (Default = master).
-   4. **Function Folder**: The name of folder containing the function code (Default = fappDeploy).
+   2. **Function Git Hub URL**: Github URL of the function app repository.(ending by .git)
+   3. **Function Git Hub Branch**: Name of the Github branch to use when deploying (Default = master).
+   4. **Function Folder**: The name of folder in Github repository containing the function code (Default = fappDeploy).
    5. **Owner Name**: Owner of this deployment, person to contact for question.    
    6. **Expire On**: Just a text value (format: yyyy-MM-dd) that express when it is safe to delete these resources.
 
-### Events and its corresponding event types sent by the event-grid: [Link](https://docs.microsoft.com/en-us/azure/event-grid/overview#event-sources)
+### Acceptale Azure Events: [Link](https://docs.microsoft.com/en-us/azure/event-grid/overview#event-sources)
+
+Here is the list of Azure events acceptable by function and corresponding converted event names sent to Github Repository.
+
 ```sh
 Azure App Configuration Events
   1.Microsoft.AppConfiguration.KeyValueModified: appconfiguration-keyvaluemodified
