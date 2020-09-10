@@ -174,6 +174,15 @@ Azure SignalR Service Events
   2.Microsoft.SignalRService.ClientConnectionDisconnected: signalrservice-clientconnectiondisconnected
 
 ```
+### Function URL and host key:
+
+Below are the steps to get the function app URL
+- Go inside the resource group and select the overview from the left panel
+- From the list of resources select your function app that should take you to the function app page.
+- Click on the Functions from the left side panel and you would see the available functions in this case only one named as 'generic_trigger'.
+- Select the function and then click on the 'Get Function Url' button from the top menu.
+- You should be seeing the function URL along with the default key now.
+- You can also select the authentication key from the drop down of the appeared window based on requirment.
 
 ### Example:
 #### To send any event from event-grid to the function app:
