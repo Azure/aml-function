@@ -194,6 +194,7 @@ Below are the steps to get the function app URL
      ![Resource Group ](/images/click-get-url.png)
 
 - You should be seeing the function URL along with the default key now.
+
      ![Resource Group ](/images/copy-function-url.png)
  
 - You can also select the authentication key from the drop down of the appeared window based on requirment.
