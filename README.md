@@ -178,13 +178,27 @@ Azure SignalR Service Events
 
 Below are the steps to get the function app URL
 - Go inside the resource group and select the overview from the left panel
-   ![Resource Group ](/images/click-overview-resource-group.png)
-   Format: ![Alt Text](url)
+
+    ![Resource Group ](/images/click-overview-resource-group.png)
+  
 - From the list of resources select your function app that should take you to the function app page.
-- Click on the Functions from the left side panel and you would see the available functions in this case only one named as 'generic_trigger'.
+
+- Click on the Functions from the left side panel and you would see the available functions in this case only one, named as 'generic_trigger'.
+
+     ![Resource Group ](/images/click-functions.png)
+     
+     ![Resource Group ](/images/select-function-generic_triggers.png)
+
 - Select the function and then click on the 'Get Function Url' button from the top menu.
+
+     ![Resource Group ](/images/click-get-url.png)
+
 - You should be seeing the function URL along with the default key now.
+     ![Resource Group ](/images/copy-function-url.png)
+ 
 - You can also select the authentication key from the drop down of the appeared window based on requirment.
+
+     ![Resource Group ](/images/select-authentication-key.png)
 
 ### Example:
 #### To send any event from event-grid to the function app:
