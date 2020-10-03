@@ -1,26 +1,89 @@
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Faml-function%2Fmaster%2F.cloud%2F.azure%2Fazuredeploy.json)
 
-# function_app 
-This repository contains an Azure Function app which contains an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send All type of Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
-This function-app once deployed the function can be registered to event grid either manually or using our GitHub Action.
+# aml_function 
+This repository contains an Azure Function app code which contains an Http Trigger function. The function named 'generic_trigger' can send github repository dispatch event when triggered. The function can be invoked by sending a POST request. The function process the Azure events if the event source is from the list of Azure Resources specified below. The function converts the event_type to an appropriate format understandable by Github workflows and sends the repository dispatch event to the Github repository specified in the request parameter. 
+This function-app once deployed, can be registered to event grid either manually or with ARM template by specifying the function endpoint as webhook url of event subscription using GitHub workflow.
 
-#### Basic Requirements to use the function:
-  1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
+### 1. Prerequisites
 
-#### Basic Requirements to use the Deploy to Azure button (Mandatory):
+ The following prerequisites are required to make this repository work:
+- Azure subscription
+- Contributor access to the Azure subscription
+- Access to [GitHub Actions](https://github.com/features/actions)
+
+If you don’t have an Azure subscription, create a free account before you begin. Get started today with a [free Azure account](https://azure.com/free/open-source)!
+
+### 2. Setting up the required secrets
+
+#### To allow GitHub Actions to access Azure
+An [Azure service principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals) needs to be generated. Just go to the Azure Portal to find the details of your resource group. Then start the Cloud CLI or install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) on your computer and execute the following command to generate the required credentials:
+
+```sh
+# Replace {service-principal-name}, {subscription-id} and {resource-group} with your 
+# Azure subscription id and resource group name and any name for your service principle
+az ad sp create-for-rbac --name {service-principal-name} \
+                         --role contributor \
+                         --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
+                         --sdk-auth
+```
+
+This will generate the following JSON output:
+
+```sh
+{
+  "clientId": "<GUID>",
+  "clientSecret": "<GUID>",
+  "subscriptionId": "<GUID>",
+  "tenantId": "<GUID>",
+  (...)
+}
+```
+
+Add this JSON output as [a secret](https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets) with the name `AZURE_CREDENTIALS` in your GitHub repository:
+
+To do so, click on the Settings tab in your repository, then click on Secrets and finally add the new secret with the name `AZURE_CREDENTIALS` to your repository.
+
+Please follow [this link](https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets) for more details. 
+
+#### To Allow Azure to trigger a GitHub Workflow
+ We also need GH PAT token with `repo` access so that function can trigger the appropriate workflow by sending the repository dispatch event to Github Repository with this PAT token. 
+ 
+ Add the PAT token with as [a secret](https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets) with the name `PAT_TOKEN` in your GitHub repository:
+
+
+#### parameters_file (Parameters File)
+
+A sample file can be found in this repository in the folder `.cloud/.azure/`. The JSON file can include the following parameters:
+
+| Parameter             | Required|  Default | Description |
+| -------------------   | --------|  ----------| ----------- |
+| functionAppName       |  x      |  fappDeploy | Function app name |
+| functionGitHubURL     |  x      |  https://github.com/mlopstemplates/function_app.git | Github URL of the function app repository. |
+| functionGitHubBranch  |  x      |  master     | Github branch of the function app repository. |
+| functionFolder        |  x      |  fappdeploy | Folder name of the Github repository which contains the function app. |
+| ownerName             |  x      |  amlfunction| The owner name of the function app. |
+| patToken              |  x      |  PAT_TOKEN  | This is a Github Personal Access Token with `repo` access, stored as a secret in the Github Repository where this template is being used.. |
+
+
+### Deploy to Azure button 
+
+  #### Mandatory Requirements:
   1. **Subscription**: You need to select a subscription plan in order to deploy to Azure. Get started today with a [free Azure account](https://azure.com/free/open-source)!
   2. **Resource Group**: You can either select an existing resource group or create a new one.
-  3. **Pat Token**: You need to provide the personal access token.
+  3. **Pat Token**: You need to provide GH PAT token with `repo` access so that function can trigger the appropriate workflow by sending the repository dispatch event to Github Repository with this PAT token.
   
   ##### Other optional configurable parameters to use with Deploy to Azure button
    1. **Function App Name**: Name use as base-template to name the resources to be deployed in Azure (Default = fappDeploy).
-   2. **Function Git Hub URL**: The URL of GitHub (ending by .git)
-   3. **Function Git Hub Branch**: Name of the branch to use when deploying (Default = master).
-   4. **Function Folder**: The name of folder containing the function code (Default = fappDeploy).
+   2. **Function Git Hub URL**: Github URL of the function app repository.(ending by .git)
+   3. **Function Git Hub Branch**: Name of the Github branch to use when deploying (Default = master).
+   4. **Function Folder**: The name of folder in Github repository containing the function code (Default = fappDeploy).
    5. **Owner Name**: Owner of this deployment, person to contact for question.    
    6. **Expire On**: Just a text value (format: yyyy-MM-dd) that express when it is safe to delete these resources.
 
-### Events and its corresponding event types sent by the event-grid: [Link](https://docs.microsoft.com/en-us/azure/event-grid/overview#event-sources)
+### Acceptale Azure Events: [Link](https://docs.microsoft.com/en-us/azure/event-grid/overview#event-sources)
+
+Here is the list of Azure events acceptable by function and corresponding converted event names sent to Github Repository.
+
 ```sh
 Azure App Configuration Events
   1.Microsoft.AppConfiguration.KeyValueModified: appconfiguration-keyvaluemodified
@@ -111,6 +174,32 @@ Azure SignalR Service Events
   2.Microsoft.SignalRService.ClientConnectionDisconnected: signalrservice-clientconnectiondisconnected
 
 ```
+### Function URL and host key:
+
+Below are the steps to get the function app URL
+- Go inside the resource group and select the overview from the left panel
+
+    ![Resource Group ](/images/click-overview-resource-group.png)
+  
+- From the list of resources select your function app that should take you to the function app page.
+
+- Click on the Functions from the left side panel and you would see the available functions in this case only one, named as 'generic_trigger'.
+
+     ![Resource Group ](/images/click-functions.png)
+     
+     ![Resource Group ](/images/select-function-generic_triggers.png)
+
+- Select the function and then click on the 'Get Function Url' button from the top menu.
+
+     ![Resource Group ](/images/click-get-url.png)
+
+- You should be seeing the function URL along with the default key now.
+
+     ![Resource Group ](/images/copy-function-url.png)
+ 
+- You can also select the authentication key from the drop down of the appeared window based on requirment.
+
+     ![Resource Group ](/images/select-authentication-key.png)
 
 ### Example:
 #### To send any event from event-grid to the function app:
