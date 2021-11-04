@@ -14,8 +14,8 @@ This function-app once deployed the function can be registered to event grid eit
   
   ##### Other optional configurable parameters to use with Deploy to Azure button
    1. **Function App Name**: Name use as base-template to name the resources to be deployed in Azure (Default = fappDeploy).
-   2. **Function Git Hub URL**: The URL of GitHub (ending by .git)
-   3. **Function Git Hub Branch**: Name of the branch to use when deploying (Default = master).
+   2. **Function GitHub URL**: The URL of GitHub (ending by .git)
+   3. **Function GitHub Branch**: Name of the branch to use when deploying (Default = master).
    4. **Function Folder**: The name of folder containing the function code (Default = fappDeploy).
    5. **Owner Name**: Owner of this deployment, person to contact for question.    
    6. **Expire On**: Just a text value (format: yyyy-MM-dd) that express when it is safe to delete these resources.
